@@ -147,8 +147,9 @@ const STORAGE_KEY = 'paperDesignConfig';
             measureContainer.style.flexDirection = 'column';
             
             // Calculate column width (A4 Landscape = 297mm. 3 cols. gaps ~2px total)
-            // (297 / 3) roughly 99mm. 
-            measureContainer.style.width = '98mm'; 
+            // 297mm * 3.7795 px/mm ~= 1122.5px
+            // (1122.5 - 2px gap) / 3 ~= 373.5px
+            measureContainer.style.width = '373px'; 
             
             document.body.appendChild(measureContainer);
 
@@ -159,6 +160,8 @@ const STORAGE_KEY = 'paperDesignConfig';
                 // Force layout context
                 el.style.width = '100%'; 
                 el.style.boxSizing = 'border-box';
+                // Remove any margin that might affect measurement
+                el.style.margin = '0';
                 measureContainer.appendChild(el);
                 blockElements.push(el);
             }
@@ -196,8 +199,9 @@ const STORAGE_KEY = 'paperDesignConfig';
                         }
                     }
                 }
-                // Add a tiny margin buffer just in case
-                return Math.ceil(h + 2); 
+                // Precision: Round to nearest pixel, no buffer to avoid accumulation errors
+                // We use ceil to ensure we don't cut off 0.5px text
+                return Math.ceil(h); 
             });
 
             // Cleanup
@@ -205,9 +209,8 @@ const STORAGE_KEY = 'paperDesignConfig';
 
             // 6. Distribute
             // A4 Height = 210mm ~= 793px.
-            // Safety Margin: Leave space for page margins if any, or browser rendering diffs.
-            // Using 740px to be very safe.
-            const COL_MAX_HEIGHT_PX = 740;
+            // Safety Margin: Leave very small space (e.g., 5px) for browser inconsistencies
+            const COL_MAX_HEIGHT_PX = 788;
             
             const newAppState = [];
             let currentPage = [[], [], []];
