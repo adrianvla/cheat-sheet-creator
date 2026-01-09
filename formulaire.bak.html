@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 0;
+        }
+        html{
+            background:#ccc;
+            font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif
+        }
+        @media screen {
+            body { 
+                background: #e0e0e0;
+                margin:auto;
+                display:flex;
+                justify-content:center;
+                align-items:center;
+            }
+        
+            .page {
+                background: white;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                border: 1px solid #000;
+                box-sizing: border-box;
+            }
+            .sheet-outer{
+                display:flex;
+                flex-direction: column;
+                gap:50px;
+                margin-top:50px;
+            }
+        }
+
+        .sheet-outer.A4.landscape { 
+            width: 297mm;
+            height: 210mm;
+        }
+        .sheet-outer.A4 { 
+            width: 210mm;
+            height: 297mm;
+        }
+        @media print {
+            .page{
+                margin: 0;
+                /* border: 1px solid #000; */
+            }
+            body{
+                margin:0;
+                background:#fff;
+                padding:0;
+            }
+            html{
+                background:#fff;
+            }
+            .end{
+                display:none;
+            }
+        }
+        .page{
+            page-break-after: always;
+            height:100%;
+            margin: 0;
+            padding: 0;
+        }
+        .A4.landscape .page{
+            width: 297mm;
+            height: 210mm;
+        }
+    </style>
+    <style>
+        .grid {  
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 1fr;
+            gap: 0px 1px;
+            grid-auto-flow: row;
+            grid-template-areas:
+                ". . .";
+            background:#000;
+            height:100%;
+        }
+        .col{
+            height:100%;
+            background:white;
+            display:flex;
+            flex-direction: column;
+        }
+        .def{
+            background-image: linear-gradient(45deg, #ffffff 45%, #ffc144 45.1%, #ffc144 50%, #ffffff 50.1%, #ffffff 95%, #ffc144 95.1%, #ffc144 100%);
+            color:#ffc144;
+            opacity:0.9;
+        }
+        .thm{
+            background-image: linear-gradient(45deg, #ffffff 45%, #ff44f6 45.1%, #ff44f6 50%, #ffffff 50.1%, #ffffff 95%, #ff44f6 95.1%, #ff44f6 100%);
+            color:#ff44f6;
+            opacity:0.5;
+        }
+        .ideearg{
+            background-image: linear-gradient(45deg, #ffffff 45%, #4a44ff 45.1%, #4a44ff 50%, #ffffff 50.1%, #ffffff 95%, #4a44ff 95.1%, #4a44ff 100%);
+            color:#4a44ff;
+            opacity:0.5;
+        }
+        .res{
+            background-image: linear-gradient(45deg, #ffffff 45%, #28c900 45.1%, #28c900 50%, #ffffff 50.1%, #ffffff 95%, #28c900 95.1%, #28c900 100%);
+            color:#28c900;
+            opacity:0.6;
+        }
+        .divider{
+            height:1px;
+            background:#000;
+        }
+        .divider{
+            position:relative;
+            height:0px;
+        }
+        .divider:before{
+            content: "";
+            position:absolute;
+            top:-1px;
+            left:0;
+            width:100%;
+            height:1px;
+            border-top:1px solid #000;
+        }
+        .sdivider{
+            position:relative;
+            height:0px;
+        }
+        .sdivider:before{
+            content: "";
+            position:absolute;
+            top:-1px;
+            left:0;
+            width:100%;
+            height:1px;
+            border-top:1px dashed #000;
+        }
+        .double-divider{
+            height:5px;
+            box-sizing: border-box;
+            border-top:1px solid #000;
+            border-bottom:1px solid #000;
+        }
+        .block{
+            background-size: 10px 10px;
+            position:relative;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+        }
+        .important{
+            border:2px dashed #000;
+            box-sizing: border-box;
+        }
+        .inside{
+            opacity:0.7;
+            display:none;
+        }
+    </style>
+</head>
+<body>
+    <div class="sheet-outer A4 landscape">
+        <section class="page">
+            <div class="grid">
+                <div class="col">
+                    <div class="block thm important" style="height:3.5cm"><span class="inside">c1</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block ideearg" style="height:1.4cm"><span class="inside">c8</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block res" style="height:0.6cm"><span class="inside">c9</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block ideearg" style="height:2.5cm"><span class="inside">c10</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block res" style="height:0.7cm"><span class="inside">c13 & c14 </span></div>
+                    <div class="sdivider"></div>
+                    <div class="block res important" style="height:2.2cm"><span class="inside">c15 & c16 </span></div>
+                    <div class="sdivider"></div>
+                    <div class="block thm important" style="height:1.3cm"><span class="inside">c17 </span></div>
+                    <div class="sdivider"></div>
+                    <div class="block res" style="height:1cm"><span class="inside">c18</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block res" style="height:1cm"><span class="inside">c19</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block ideearg important" style="height:6.7cm"><span class="inside">E.2.6a </span></div>
+                </div>
+                <div class="col">
+                    <div class="block ideearg important" style="height:5.0cm"><span class="inside">E.2.6a</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block res" style="height:1.5cm"><span class="inside">c20</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block ideearg" style="height:2cm"><span class="inside">c21</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block res" style="height:1.3cm"><span class="inside">E3.1</span></div>
+                    <div class="divider"></div>
+                    <div class="block def" style="height:1.1cm"><span class="inside">g2</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block def" style="height:2.8cm"><span class="inside">g5 & g6</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block def" style="height:3.9cm"><span class="inside">g6 & g7 & g8 & g9 & g10 & g11</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block def" style="height:0.9cm"><span class="inside">g12</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block def" style="height:0.8cm"><span class="inside">g14 & g15</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block ideearg" style="height:1.6cm"><span class="inside">g16</span></div>
+                </div>
+                <div class="col">
+                    <div class="block def" style="height:0.6cm"><span class="inside">g17</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block def" style="height:0.7cm"><span class="inside">g18</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block def" style="height:3.2cm"><span class="inside">g19</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block res" style="height:2.1cm"><span class="inside">g20 + E3.6</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block def" style="height:1.9cm"><span class="inside">g21</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block thm important" style="height:2.3cm"><span class="inside">g23</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block thm" style="height:1.3cm"><span class="inside">E3.4</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block def" style="height:0.7cm"><span class="inside">g25</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block def" style="height:0.6cm"><span class="inside">g26</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block thm" style="height:1.9cm"><span class="inside">g28</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block thm important" style="height:5.6cm"><span class="inside">g29 & g30</span></div>
+                </div>
+            </div>
+        </section>
+        <section class="page">
+            <div class="grid">
+                <div class="col">
+                    <div class="block def" style="height:3.5cm"><span class="inside">G.31</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block thm" style="height:2.2cm"><span class="inside">G.32</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block ideearg" style="height:1.4cm"><span class="inside">E4.3c</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block def" style="height:1.9cm"><span class="inside">G.34</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block def" style="height:3.3cm"><span class="inside">G.35</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block ideearg" style="height:3.2cm"><span class="inside">G.36</span></div>
+                    <div class="divider"></div>
+                    <div class="block def" style="height:1.3cm"><span class="inside">G.37</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block thm" style="height:1.2cm"><span class="inside">G.38</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block thm" style="height:1.2cm"><span class="inside">G.39</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block ideearg" style="height:1.7cm"><span class="inside">E5.2</span></div>
+                </div>
+                <div class="col">
+                    <div class="block ideearg" style="height:4.2cm"><span class="inside">E5.2</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block res" style="height:7.3cm"><span class="inside">G.40</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block res" style="height:1.3cm"><span class="inside">E4.6</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block thm important" style="height:0.9cm"><span class="inside">G.42</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block ideearg" style="height:7.2cm"><span class="inside">G.44 & G.45 & G.46 & G.47 & G.49 & G.51</span></div>
+                </div>
+                <div class="col">
+                    <div class="block def" style="height:1.0cm"><span class="inside">G.50</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block ideearg" style="height:3.1cm"><span class="inside">G.52</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block thm important" style="height:2.3cm"><span class="inside">G.53</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block res" style="height:2.6cm"><span class="inside">G.54</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block def" style="height:2.8cm"><span class="inside">G.55</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block def" style="height:1.5cm"><span class="inside">G.56</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block ideearg important" style="height:3.3cm"><span class="inside">G.57</span></div>
+                    <div class="divider"></div>
+                    <div class="block def" style="height:0.6cm"><span class="inside">G.61</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block thm important" style="height:2.0cm"><span class="inside">G.64 & G.66</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block thm important" style="height:1.7cm"><span class="inside">G.67</span></div>
+                </div>
+            </div>
+        </section>
+        <section class="page">
+            <div class="grid">
+                <div class="col">
+                    <div class="block ideearg" style="height:5.8cm"><span class="inside">F.3</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block res" style="height:1.3cm"><span class="inside">F.4</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block res" style="height:1.8cm"><span class="inside">F.7</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block res" style="height:1.0cm"><span class="inside">F.8</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block thm important" style="height:2.4cm"><span class="inside">F.10</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block res" style="height:8.6cm"><span class="inside">F.11</span></div>
+                </div>
+                <div class="col">
+                    <div class="block ideearg" style="height:3.7cm"><span class="inside">E5.6b</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block ideearg" style="height:8.2cm"><span class="inside">F.26</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block ideearg important" style="height:9cm"><span class="inside">F.28</span></div>
+                </div>
+                <div class="col">
+                    <div class="block ideearg important" style="height:5.2cm"><span class="inside">F.29</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block def" style="height:3.8cm"><span class="inside">Defs Catalan</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block ideearg important" style="height:11.9cm"><span class="inside">F.30</span></div>
+                </div>
+            </div>
+        </section>
+        <section class="page">
+            <div class="grid">
+                <div class="col">
+                    <div class="block def" style="height:0.8cm"><span class="inside">A.2</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block def" style="height:0.7cm"><span class="inside">A.3</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block thm" style="height:0.8cm"><span class="inside">A.6</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block res" style="height:0.9cm"><span class="inside">A.8 & C.22</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block res" style="height:2.7cm"><span class="inside">A.9</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block thm important" style="height:3cm"><span class="inside">A.10</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block res" style="height:1.3cm"><span class="inside">A.12 & A.13</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block def" style="height:1.2cm"><span class="inside">A.14</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block ideearg important" style="height:9.5cm"><span class="inside">A.15</span></div>
+                </div>
+                <div class="col">
+                    <div class="block thm" style="height:2.4cm"><span class="inside">A.16</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block thm important" style="height:1.6cm"><span class="inside">A.17</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block def" style="height:3.5cm"><span class="inside">A.19 & E7.7</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block res" style="height:1.6cm"><span class="inside">E8.6</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block thm" style="height:1.5cm"><span class="inside">Thm Lagrange</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block def" style="height:0.9cm"><span class="inside">A.21</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block ideearg" style="height:1.6cm"><span class="inside">A.30</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block ideearg" style="height:2.1cm"><span class="inside">A.31</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block ideearg important" style="height:5.7cm"><span class="inside">A.33</span></div>
+                </div>
+                <div class="col">
+                    <div class="double-divider"></div>
+                    <div class="block ideearg" style="height:12.6cm"><span class="inside">C.4</span></div>
+                    <div class="sdivider"></div>
+                    <div class="block def" style="height:5.1cm"><span class="inside">C.12</span></div>
+                    <div class="divider"></div>
+                </div>
+            </div>
+        </section>
+        <section class="page end"></section>
+    </div>
+</body>
+</html>
