@@ -1,6 +1,7 @@
 const STORAGE_KEY = 'paperDesignConfig';
         let appState = [];
         let editingRef = null;
+        let dragSrc = null;
 
         document.addEventListener('DOMContentLoaded', () => {
             loadState();
@@ -12,6 +13,112 @@ const STORAGE_KEY = 'paperDesignConfig';
             document.getElementById('blockType').addEventListener('change', updateFormFields);
             document.getElementById('blockAutoHeight').addEventListener('change', updateFormFields);
         });
+
+        // --- Drag & Drop Handlers ---
+
+        function handleDragStart(e, pIdx, cIdx, bIdx) {
+            dragSrc = { pIdx, cIdx, bIdx };
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            // slight delay to allow the ghost image to be captured
+            setTimeout(() => e.target.style.opacity = '0.5', 0);
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+            e.target.style.opacity = '1';
+            
+            document.querySelectorAll('.drag-over-top, .drag-over-bottom, .drag-over-col').forEach(el => {
+                el.classList.remove('drag-over-top', 'drag-over-bottom', 'drag-over-col');
+            });
+            dragSrc = null;
+        }
+
+        function handleDragOverBlock(e) {
+            e.preventDefault(); // Essential to allow dropping
+            if (!dragSrc) return;
+            e.dataTransfer.dropEffect = 'move';
+            
+            const rect = e.currentTarget.getBoundingClientRect();
+            const relY = e.clientY - rect.top;
+            const height = rect.height;
+            
+            e.currentTarget.classList.remove('drag-over-top', 'drag-over-bottom');
+            
+            if (relY < height / 2) {
+                e.currentTarget.classList.add('drag-over-top');
+            } else {
+                e.currentTarget.classList.add('drag-over-bottom');
+            }
+        }
+
+        function handleDragLeaveBlock(e) {
+            e.currentTarget.classList.remove('drag-over-top', 'drag-over-bottom');
+        }
+
+        function handleDropBlock(e, targetPIdx, targetCIdx, targetBIdx) {
+            e.stopPropagation(); // Stop column drop
+            e.preventDefault();
+            
+            if (!dragSrc) return;
+            const { pIdx: srcP, cIdx: srcC, bIdx: srcB } = dragSrc;
+            
+            // Don't drop on self
+            if (srcP === targetPIdx && srcC === targetCIdx && srcB === targetBIdx) return;
+
+            const rect = e.currentTarget.getBoundingClientRect();
+            const relY = e.clientY - rect.top;
+            const insertAfter = relY > rect.height / 2;
+            
+            // Move Logic
+            // 1. Remove from source
+            const block = appState[srcP][srcC][srcB];
+            appState[srcP][srcC].splice(srcB, 1);
+            
+            // 2. Adjust target index if in same column and we removed from above
+            let finalTargetB = targetBIdx;
+            if (srcP === targetPIdx && srcC === targetCIdx && srcB < targetBIdx) {
+                finalTargetB--;
+            }
+
+            // 3. Insert
+            if (insertAfter) {
+                appState[targetPIdx][targetCIdx].splice(finalTargetB + 1, 0, block);
+            } else {
+                appState[targetPIdx][targetCIdx].splice(finalTargetB, 0, block);
+            }
+            
+            saveState();
+            renderApp();
+        }
+
+        function handleDragOverCol(e) {
+             e.preventDefault();
+             if (!dragSrc) return;
+             e.currentTarget.classList.add('drag-over-col');
+        }
+
+        function handleDragLeaveCol(e) {
+             e.currentTarget.classList.remove('drag-over-col');
+        }
+
+        function handleDropCol(e, targetPIdx, targetCIdx) {
+            e.preventDefault();
+            if (!dragSrc) return;
+            const { pIdx: srcP, cIdx: srcC, bIdx: srcB } = dragSrc;
+            
+            const block = appState[srcP][srcC][srcB];
+            
+            // Remove from source
+            appState[srcP][srcC].splice(srcB, 1);
+            
+            // Push to end of target col
+            appState[targetPIdx][targetCIdx].push(block);
+            
+            saveState();
+            renderApp();
+        }
+
 
         /**
          * Refactored Auto-Distribute to be more robust and prevent "long page" issues.
@@ -243,9 +350,24 @@ const STORAGE_KEY = 'paperDesignConfig';
                     const colEl = document.createElement('div');
                     colEl.className = 'col';
 
+                    // Col Drop Zone
+                    colEl.ondragover = handleDragOverCol;
+                    colEl.ondragleave = handleDragLeaveCol;
+                    colEl.ondrop = (e) => handleDropCol(e, pIdx, cIdx);
+
                     colData.forEach((blockData, bIdx) => {
                         const el = createBlockElement(blockData);
                         el.onclick = () => openEditModal(pIdx, cIdx, bIdx);
+                        
+                        // Drag Attributes
+                        el.draggable = true;
+                        el.ondragstart = (e) => handleDragStart(e, pIdx, cIdx, bIdx);
+                        el.ondragend = handleDragEnd;
+                        el.ondragover = handleDragOverBlock;
+                        el.ondragenter = handleDragOverBlock; 
+                        el.ondragleave = handleDragLeaveBlock;
+                        el.ondrop = (e) => handleDropBlock(e, pIdx, cIdx, bIdx);
+
                         colEl.appendChild(el);
                     });
 

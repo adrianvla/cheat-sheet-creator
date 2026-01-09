@@ -1,0 +1,17 @@
+.block.dragging {
+    opacity: 0.4;
+    border: 2px dashed #000;
+}
+
+.block.drag-over-top {
+    border-top: 4px solid #007bff;
+}
+
+.block.drag-over-bottom {
+    border-bottom: 4px solid #007bff;
+}
+
+.col.drag-over-col {
+    background-color: rgba(0, 123, 255, 0.1);
+    outline: 2px dashed #007bff;
+}
