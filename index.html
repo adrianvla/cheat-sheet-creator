@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
-
+    <link rel="stylesheet" href="printable.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -99,6 +99,7 @@
     <div class="tools no-print">
         <button class="btn btn-secondary" onclick="createNewPage()">+ New Page</button>
         <button class="btn btn-secondary" onclick="exportConfig()">Export .cheat-sheet</button>
+        <button class="btn btn-secondary" onclick="autoDistributeBlocks()">Reflow / Auto-Layout</button>
         <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">Import .cheat-sheet</button>
         <input type="file" id="importFile" style="display:none" onchange="importConfig(this)">
         <button class="btn btn-danger" onclick="resetConfig()">Reset / New Doc</button>

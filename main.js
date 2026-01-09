@@ -13,6 +13,133 @@ const STORAGE_KEY = 'paperDesignConfig';
             document.getElementById('blockAutoHeight').addEventListener('change', updateFormFields);
         });
 
+        /**
+         * Refactored Auto-Distribute to be more robust and prevent "long page" issues.
+         */
+        async function autoDistributeBlocks() {
+            if(!confirm('This will rearrange ALL blocks to fit into columns and create new pages as needed. Existing layout will be lost. Continue?')) return;
+
+            // 1. Flatten all blocks
+            const allBlocks = [];
+            appState.forEach(pData => pData.forEach(cData => cData.forEach(bData => allBlocks.push(bData))));
+            
+            if (allBlocks.length === 0) return;
+
+            // 2. Setup Measure Container
+            // We append to body to ensure it's part of the DOM for measurement,
+            // but keep it hidden and out of the flow.
+            const measureContainer = document.createElement('div');
+            measureContainer.style.position = 'absolute';
+            measureContainer.style.top = '0';
+            measureContainer.style.left = '0';
+            measureContainer.style.visibility = 'hidden';
+            measureContainer.style.background = 'white';
+            measureContainer.style.zIndex = '-9999';
+            // Match .col styles
+            measureContainer.style.display = 'flex';
+            measureContainer.style.flexDirection = 'column';
+            
+            // Calculate column width (A4 Landscape = 297mm. 3 cols. gaps ~2px total)
+            // (297 / 3) roughly 99mm. 
+            measureContainer.style.width = '98mm'; 
+            
+            document.body.appendChild(measureContainer);
+
+            // 3. Render Blocks for Measurement
+            const blockElements = [];
+            for (let blockData of allBlocks) {
+                const el = createBlockElement(blockData);
+                // Force layout context
+                el.style.width = '100%'; 
+                el.style.boxSizing = 'border-box';
+                measureContainer.appendChild(el);
+                blockElements.push(el);
+            }
+
+            // 4. Render Math (Async)
+            if (window.renderMathInElement) {
+                renderMathInElement(measureContainer, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false},
+                        {left: '\\(', right: '\\)', display: false},
+                        {left: '\\[', right: '\\]', display: true}
+                    ],
+                    throwOnError : false
+                });
+            }
+
+            // Wait extended time to ensure rendering is complete
+            await new Promise(r => setTimeout(r, 600));
+
+            // 5. Measure Heights
+            const blockHeights = blockElements.map((el, idx) => {
+                const rect = el.getBoundingClientRect();
+                let h = rect.height;
+                
+                // Fallback for zero-height (e.g. if display:none issues occurred)
+                // Default min height for auto-height blocks usually > 20px
+                if (h <= 0) {
+                    const content = allBlocks[idx].content || '';
+                    h = content.length > 50 ? 60 : 40; 
+                    if (allBlocks[idx].height && !allBlocks[idx].autoHeight) {
+                        // Parse "2cm" -> approx pixels
+                        if (allBlocks[idx].height.includes('cm')) {
+                             h = parseFloat(allBlocks[idx].height) * 37.8;
+                        }
+                    }
+                }
+                // Add a tiny margin buffer just in case
+                return Math.ceil(h + 2); 
+            });
+
+            // Cleanup
+            document.body.removeChild(measureContainer);
+
+            // 6. Distribute
+            // A4 Height = 210mm ~= 793px.
+            // Safety Margin: Leave space for page margins if any, or browser rendering diffs.
+            // Using 740px to be very safe.
+            const COL_MAX_HEIGHT_PX = 740;
+            
+            const newAppState = [];
+            let currentPage = [[], [], []];
+            let colIndex = 0;
+            let currentColHeight = 0;
+
+            allBlocks.forEach((blockData, i) => {
+                const h = blockHeights[i];
+                
+                // Check if adding this block exceeds max height
+                // If it's the FIRST block in the column, we must accept it (or it will never fit)
+                if (currentColHeight + h > COL_MAX_HEIGHT_PX && currentColHeight > 0) {
+                    // Move to next column
+                    colIndex++;
+                    currentColHeight = 0;
+
+                    // If we exceed 3 columns (0, 1, 2), create new page
+                    if (colIndex > 2) {
+                        newAppState.push(currentPage);
+                        currentPage = [[], [], []];
+                        colIndex = 0;
+                    }
+                }
+
+                currentPage[colIndex].push(blockData);
+                currentColHeight += h;
+            });
+            
+            // Push final page
+            if (currentPage.some(c => c.length > 0)) {
+                newAppState.push(currentPage);
+            }
+
+            // 7. Update State
+            appState = newAppState;
+            saveState();
+            renderApp();
+        }
+
         function exportConfig() {
             const dataStr = JSON.stringify(appState, null, 2);
             const blob = new Blob([dataStr], {type: "application/json"});
